@@ -5,7 +5,7 @@ from openai import OpenAI
 import os
 
 load_dotenv()
-
+# cmd to run worker - rq worker --worker-class rq.worker.SimpleWorker --with-scheduler
 # load the data from vector db qdrant
 embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-mpnet-base-v2"
@@ -59,3 +59,4 @@ def process_query(query: str):
     )
 
     print("🤖 : ", response.choices[0].message.content)
+    return response.choices[0].message.content

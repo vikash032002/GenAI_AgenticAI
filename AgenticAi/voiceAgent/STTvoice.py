@@ -2,6 +2,9 @@ import speech_recognition as sr
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import asyncio
+from openai import AsyncOpenAI
+from openai.helpers import LocalAudioPlayer
 
 load_dotenv()
 
@@ -9,6 +12,20 @@ client = OpenAI(
     api_key=os.getenv("GEMINI_API_KEY"),
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
 )
+
+openai = AsyncOpenAI()
+
+#text to speech
+async def tts(speech:str):
+    async with openai.audio.speech.with_streaming_response.create(
+        model="gpt-4o-mini-tts",
+        voice="coral",
+        input=speech,
+        instructions="Speak in a cheerful and positive tone.",
+        response_format="pcm",
+    ) as response:
+        await LocalAudioPlayer().play(response)
+
 
 def main():
     r = sr.Recognizer() # speech to text
@@ -38,5 +55,6 @@ def main():
         ai_response = response.choices[0].message.content
         print("you said", stt)
         print("Ai_respone",ai_response)
+        asyncio.run(tts(speech=ai_response))
 
 main()
